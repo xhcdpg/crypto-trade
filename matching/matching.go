@@ -2,6 +2,7 @@ package matching
 
 import (
 	"github.com/xhcdpg/crypto-trade/models"
+	"github.com/xhcdpg/crypto-trade/position"
 	"time"
 )
 
@@ -78,7 +79,23 @@ func NewOrderBook(symbol string) *OrderBook {
 	}
 }
 
+func (ob *OrderBook) GetMidPrice() float64 {
+	if len(ob.Asks) == 0 || len(ob.Bids) == 0 {
+		return 0.0
+	}
+	return (ob.Asks[0].Price + ob.Bids[0].Price) / 2
+}
+
 type MatchingEngine struct {
 	orderBooks      map[string]*OrderBook
-	positionManager *position.Manager
+	positionManager *position.PositionManager
+}
+
+func (m *MatchingEngine) GetOrderBook(symbol string) *OrderBook {
+	if ob, ok := m.orderBooks[symbol]; ok {
+		return ob
+	}
+	ob := NewOrderBook(symbol)
+	m.orderBooks[symbol] = ob
+	return ob
 }

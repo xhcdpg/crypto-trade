@@ -9,15 +9,17 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/xhcdpg/crypto-trade/models"
+	"github.com/xhcdpg/crypto-trade/user"
 	"log"
 	"sync"
 )
 
 type WebsocketService struct {
-	clients    map[*websocket.Conn]string // conn -> userID
-	clientMu   sync.Mutex
-	publisher  message.Publisher
-	subscriber message.Subscriber
+	clients     map[*websocket.Conn]string // conn -> userID
+	clientMu    sync.Mutex
+	userService *user.UserService
+	publisher   message.Publisher
+	subscriber  message.Subscriber
 }
 
 func NewWebsocketService(publisher message.Publisher, amqpURI string) *WebsocketService {
@@ -80,8 +82,8 @@ func (ws *WebsocketService) HandleConnection(conn *websocket.Conn) {
 		}
 		switch msg.Type {
 		case "auth":
-			user, err := ws.userService.GetUser(msg.UserID)
-			if err != nil || user.Token != msg.Token {
+			_, err := ws.userService.GetUser(msg.UserID)
+			if err != nil {
 				conn.WriteJSON(gin.H{"error": "auth failed"})
 				return
 			}

@@ -1,10 +1,10 @@
 package types
 
-type MarginType string
+type MarginMode string
 
 const (
-	CrossMargin    MarginType = "cross"
-	IsolatedMargin MarginType = "isolated"
+	CrossMargin    MarginMode = "cross"
+	IsolatedMargin MarginMode = "isolated"
 )
 
 type OrderType string
