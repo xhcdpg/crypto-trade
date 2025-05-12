@@ -13,8 +13,6 @@ import (
 	"time"
 )
 
-var systemID = "000000000000"
-
 type OrderNode struct {
 	Price     float64
 	Quantity  float64
@@ -222,7 +220,7 @@ func (m *MatchingEngine) matchBuyLimit(ob *OrderBook, order *models.Order, publi
 	trade := &models.Trade{
 		ID:        uuid.New().String(),
 		Symbol:    order.Symbol,
-		BuyerID:   systemID,
+		BuyerID:   types.SystemID,
 		SellerID:  order.ID,
 		Price:     markPrice,
 		Quantity:  order.Quantity,
@@ -265,7 +263,7 @@ func (m *MatchingEngine) matchSellLimit(ob *OrderBook, order *models.Order, publ
 	trade := &models.Trade{
 		ID:        uuid.New().String(),
 		Symbol:    order.Symbol,
-		BuyerID:   systemID,
+		BuyerID:   types.SystemID,
 		SellerID:  order.ID,
 		Price:     order.Price,
 		Quantity:  order.Quantity,
@@ -297,7 +295,7 @@ func (m *MatchingEngine) handleMarketOrder(ob *OrderBook, order *models.Order, p
 			ID:        uuid.New().String(),
 			Symbol:    order.Symbol,
 			BuyerID:   order.UserID,
-			SellerID:  systemID,
+			SellerID:  types.SystemID,
 			Price:     markPrice,
 			Quantity:  order.Quantity,
 			Timestamp: time.Now(),
@@ -320,7 +318,7 @@ func (m *MatchingEngine) handleMarketOrder(ob *OrderBook, order *models.Order, p
 		trade := &models.Trade{
 			ID:        uuid.New().String(),
 			Symbol:    order.Symbol,
-			BuyerID:   systemID,
+			BuyerID:   types.SystemID,
 			SellerID:  order.UserID,
 			Price:     markPrice,
 			Quantity:  order.Quantity,

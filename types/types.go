@@ -1,5 +1,7 @@
 package types
 
+const SystemID = "000000000000"
+
 type MarginMode string
 
 const (

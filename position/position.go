@@ -4,6 +4,8 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/google/uuid"
 	"github.com/xhcdpg/crypto-trade/models"
+	"github.com/xhcdpg/crypto-trade/types"
+	u "github.com/xhcdpg/crypto-trade/user"
 	"sync"
 )
 
@@ -47,7 +49,7 @@ func (pm *PositionManager) getOrCreatePosition(userID, symbol string) *models.Po
 		InitialMargin:     0.0,
 		LiquidationPrice:  0.0,
 	}
-
+	pm.positions[userID][symbol] = newPosition
 	return newPosition
 }
 
@@ -76,4 +78,53 @@ func (pm *PositionManager) GetAllPositions() []*models.Position {
 	}
 
 	return allPositions
+}
+
+func (pm *PositionManager) UpdatePositionFromTrade(trade *models.Trade, leverage uint, marginType types.MarginMode) error {
+	var (
+		position *models.Position
+		side     types.Side
+	)
+
+	if trade.BuyerID != types.SystemID {
+		position = pm.getOrCreatePosition(trade.BuyerID, trade.Symbol)
+		side = types.Buy
+	} else {
+		position = pm.getOrCreatePosition(trade.SellerID, trade.Symbol)
+		side = types.Sell
+	}
+
+	user, err := u.GlobalUserService.GetUser(trade.ID)
+	if err != nil {
+		return err
+	}
+
+	if position.Quantity == 0 {
+		// new position
+		position.EntryPrice = trade.Price
+	} else {
+		if position.Side == types.Buy {
+			if side == types.Buy {
+				totalQuantity := position.Quantity + trade.Quantity
+				position.EntryPrice = (position.EntryPrice*position.Quantity + trade.Price*trade.Quantity) / totalQuantity
+			} else {
+				// reverse open position
+				// close position
+				if position.Quantity > trade.Quantity {
+					position.Quantity -= trade.Quantity
+					position.RealizedPnl += (trade.Price - position.EntryPrice) * trade.Quantity
+				} else {
+
+				}
+			}
+		} else {
+			if side == types.Buy {
+
+			} else {
+
+			}
+		}
+	}
+
+	return nil
 }
