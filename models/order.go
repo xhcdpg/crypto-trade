@@ -16,6 +16,6 @@ type Order struct {
 	Price      float64 // 委托价
 	StopPrice  float64 // 触发价/止盈价/止损价
 	Status     types.OrderStatus
-	MarginType types.MarginType
+	MarginType types.MarginMode
 	Timestamp  time.Time
 }
